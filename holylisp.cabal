@@ -1,0 +1,79 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.34.3.
+--
+-- see: https://github.com/sol/hpack
+
+name:           holylisp
+version:        0.1.0.0
+synopsis:       The holiest among all lisps
+description:    Please see the README on GitHub at <https://github.com/dedifferentiator/holylisp#readme>
+category:       Compilers
+homepage:       https://github.com/dedifferentiator/holylisp#readme
+bug-reports:    https://github.com/dedifferentiator/holylisp/issues
+author:         413x
+maintainer:     dedifferentiator@protonmail.ch
+copyright:      Copyright (c) 2021 dedifferentiator
+license:        GPL-3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/dedifferentiator/holylisp
+
+library
+  exposed-modules:
+      Deprecated
+      Parser
+      REPL
+      Structs
+  other-modules:
+      Paths_holylisp
+  hs-source-dirs:
+      src
+  default-extensions: ConstraintKinds FlexibleContexts OverloadedStrings NoImplicitPrelude TypeApplications TypeOperators
+  build-depends:
+      base >=4.7 && <5
+    , megaparsec
+    , mtl
+    , relude
+    , text
+  default-language: Haskell2010
+
+executable hlisp
+  main-is: Main.hs
+  other-modules:
+      Paths_holylisp
+  hs-source-dirs:
+      app
+  default-extensions: NoImplicitPrelude
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall
+  build-depends:
+      base >=4.7 && <5
+    , holylisp
+    , megaparsec
+    , mtl
+    , relude
+    , text
+  default-language: Haskell2010
+
+test-suite hlisp-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_holylisp
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall
+  build-depends:
+      base >=4.7 && <5
+    , hlisp
+    , megaparsec
+    , mtl
+    , relude
+    , text
+  default-language: Haskell2010

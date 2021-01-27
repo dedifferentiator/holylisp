@@ -1,0 +1,9 @@
+* Grammar of HolyLisp
+
+** Concrete syntax
+  exp ::= _int_ | (read) | (- exp) | (+ exp exp)
+  hlisp ::= exp
+
+** Abstract syntax
+  Exp ::= _HInt_ | HRead () | HMinus Exp | HAdd Exp Exp
+  HolyLisp ::= () Exp

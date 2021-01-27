@@ -1,0 +1,65 @@
+name:                holylisp
+version:             0.1.0.0
+github:              "dedifferentiator/holylisp"
+license:             GPL-3
+author:              "413x"
+maintainer:          "dedifferentiator@protonmail.ch"
+copyright:           "Copyright (c) 2021 dedifferentiator"
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+# Metadata used when publishing your package
+synopsis:            The holiest of all lisps
+category:            Compilers
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on GitHub at <https://github.com/dedifferentiator/holylisp#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+- megaparsec
+- mtl
+- relude
+- text
+
+library:
+  source-dirs: src
+  default-extensions:
+    - ConstraintKinds
+    - FlexibleContexts
+    - OverloadedStrings
+    - NoImplicitPrelude
+    - TypeApplications
+    - TypeOperators
+
+executables:
+  hlisp:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    # - -O3
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    - -Wall
+    # - -prof
+    default-extensions:
+    - NoImplicitPrelude
+    dependencies:
+    - holylisp
+
+tests:
+  hlisp-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    - -Wall
+    dependencies:
+    - hlisp
