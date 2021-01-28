@@ -14,7 +14,8 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 module Parser
-  ( runHLisp
+  ( hParse
+  , hParseTest
   ) where
 
 import           Control.Monad (void)
@@ -86,6 +87,10 @@ pExp = HolyLisp () <$>
    <|> try pHSub
    <|> pHAdd)
 
--- | Entrypoint of the parser
-runHLisp :: T.Text -> IO ()
-runHLisp = parseTest $ pExp <* eof
+-- | Parses HLisp expression
+hParse :: T.Text -> HolyLisp
+hParse = either (error "cannot parse expression") id . parse pExp ""
+
+-- | Runs HLisp parser
+hParseTest :: T.Text -> IO ()
+hParseTest = parseTest $ pExp <* eof

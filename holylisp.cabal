@@ -6,7 +6,7 @@ cabal-version: 1.12
 
 name:           holylisp
 version:        0.1.0.0
-synopsis:       The holiest among all lisps
+synopsis:       The holiest of all lisps
 description:    Please see the README on GitHub at <https://github.com/dedifferentiator/holylisp#readme>
 category:       Compilers
 homepage:       https://github.com/dedifferentiator/holylisp#readme
@@ -28,6 +28,7 @@ source-repository head
 library
   exposed-modules:
       Deprecated
+      Eval
       Parser
       REPL
       Structs
@@ -35,7 +36,7 @@ library
       Paths_holylisp
   hs-source-dirs:
       src
-  default-extensions: ConstraintKinds FlexibleContexts OverloadedStrings NoImplicitPrelude TypeApplications TypeOperators
+  default-extensions: ConstraintKinds DataKinds FlexibleContexts OverloadedStrings NoImplicitPrelude TypeApplications TypeFamilies TypeOperators
   build-depends:
       base >=4.7 && <5
     , megaparsec

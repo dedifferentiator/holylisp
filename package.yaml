@@ -30,10 +30,12 @@ library:
   source-dirs: src
   default-extensions:
     - ConstraintKinds
+    - DataKinds
     - FlexibleContexts
     - OverloadedStrings
     - NoImplicitPrelude
     - TypeApplications
+    - TypeFamilies
     - TypeOperators
 
 executables:

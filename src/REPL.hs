@@ -17,8 +17,10 @@ module REPL
     ( repl
     ) where
 
-import Parser (runHLisp)
+import Eval
+import Parser
 import Relude
+import Structs
 
 -- | Reads input line
 readL :: IO Text
@@ -29,8 +31,8 @@ readL = getLine
 -- strings
 
 -- | Evaluates input
-evalL :: Text -> Text
-evalL = id
+evalL :: Text -> HolyLisp
+evalL = runO1 . hParse
 
 -- | Prints result of interpretation
 printL :: Show a => a -> IO ()
@@ -38,7 +40,7 @@ printL = print
 
 -- | Read-eval-print
 rep :: IO ()
-rep = readL >>= runHLisp
+rep = readL >>= printL . evalL
 
 -- | Read-eval-print loop
 repl :: IO ()
