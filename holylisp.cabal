@@ -66,13 +66,16 @@ test-suite hlisp-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      REPLSpec
       Paths_holylisp
   hs-source-dirs:
       test
+  default-extensions: BlockArguments NoImplicitPrelude OverloadedStrings
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall
   build-depends:
       base >=4.7 && <5
-    , hlisp
+    , holylisp
+    , hspec
     , megaparsec
     , mtl
     , relude

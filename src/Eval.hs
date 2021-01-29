@@ -15,11 +15,13 @@
 
 module Eval
   ( runO1
+  , runProg
   ) where
 
 import Parser
 import Relude
 import Structs
+import Data.Text (unpack)
 
 -- | Runs optimisation on AST
 runO1 :: HolyLisp -> HolyLisp
@@ -50,6 +52,49 @@ optimise exp =
     HSub (HInt i)  -> HInt $ -i
     HSub (HRead m) -> HSub $ HRead m
     HSub (HSub e)  -> e
+    HSub (HVar s)  -> HSub $ HVar s
     HSub exp       -> HSub $ optimise exp
 
+    HLet v e1 e2 -> HLet v (optimise e1) $ optimise e2
+
     _ -> exp
+
+-- | Replaces all `hvar` occurrences in `body` with `exp`, preserving shadowing
+resolveVar :: HVar -> Exp -> Exp -> Exp
+resolveVar hvar exp body =
+  case body of
+    HLet v e1 e2 -> resolveVar hvar exp $ resolveVar v e1 e2
+
+    HAdd (HInt i1) (HInt i2) -> HInt $ i1 + i2
+    HAdd (HVar v) e -> if v == hvar then HAdd exp e else HAdd (HVar v) e
+    HAdd e (HVar v) -> if v == hvar then HAdd e exp else HAdd e (HVar v)
+
+    HSub (HVar v) -> if v == hvar then HSub exp else HSub (HVar v)
+
+    _ -> exp
+
+
+-- | Interprets `Exp`
+interpretExp :: Exp -> IO Exp
+interpretExp exp = do
+  case exp of
+    HInt i -> return $ HInt i
+
+    HRead _ -> HInt . fromMaybe (error "err: cannot parse Int") . readMaybe @Int . unpack <$> getLine
+
+    HSub (HInt i) -> return $ HInt $ -i
+    HSub e -> interpretExp . HSub =<< interpretExp e
+
+    HAdd (HInt i1) (HInt i2) -> return $ HInt $ i1 + i2
+    HAdd i1@(HInt _) e -> interpretExp .      HAdd i1 =<< interpretExp e
+    HAdd e i2@(HInt _) -> interpretExp . flip HAdd i2 =<< interpretExp e
+    HAdd e1 e2         -> interpretExp =<< HAdd <$> interpretExp e1 <*> interpretExp e2
+
+    HVar v -> return $ HVar v
+
+    HLet v e body -> interpretExp $ resolveVar v e body
+
+
+-- | Interprtes hlisp into the smallest possible ast
+runProg :: HolyLisp -> IO HolyLisp
+runProg (HolyLisp m e) = HolyLisp m <$> interpretExp e

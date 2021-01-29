@@ -21,7 +21,7 @@ module Parser
 import           Control.Monad (void)
 import qualified Data.Text as T
 import           Data.Void (Void)
-import           Relude hiding (some)
+import           Relude hiding (many, some)
 import           Structs
 import           Text.Megaparsec
 import           Text.Megaparsec.Char
@@ -79,13 +79,49 @@ pHAdd = do
 
   return $ HAdd exp1 exp2
 
+-- | Parses HVar
+pHVar :: Parser HVar
+pHVar = do
+  void space
+  var <- try $ some letterChar
+  void space
+
+  return $ TVar var
+
+-- | Parses HLet
+pHLet :: Parser Exp
+pHLet = do
+  void space
+  void $ char '('
+  void space
+  void $ try $ string "let"
+  void space
+  void $ char '('
+  void space
+  void $ char '['
+  void space
+  var <- try pHVar
+  void space
+  (HolyLisp _ exp) <- try pExp
+  void space
+  void $ char ']'
+  void space
+  void $ char ')'
+  void space
+  (HolyLisp _ body) <- try pExp
+  void $ char ')'
+
+  return $ HLet var exp body
+
 -- | Parses Exp
 pExp :: Parser HolyLisp
 pExp = HolyLisp () <$>
   (try pHInt
+   <|> (try pHVar <&> HVar)
    <|> try pHRead
    <|> try pHSub
-   <|> pHAdd)
+   <|> try pHAdd
+   <|> pHLet)
 
 -- | Parses HLisp expression
 hParse :: T.Text -> HolyLisp

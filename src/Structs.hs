@@ -16,15 +16,21 @@
 module Structs
   ( Exp (..)
   , HolyLisp (..)
+  , HVar (..)
   ) where
 
 import Relude
 
+-- | Represents `var` token
+newtype HVar = TVar String deriving (Eq, Show)
+
 -- | Represents `exp` token
-data Exp = HInt Int     -- ^ `int' terminal
-         | HRead ()     -- ^ `(read)` terminal
-         | HSub Exp     -- ^ `(- exp)` non-terminal
-         | HAdd Exp Exp -- ^ `(+ exp exp)` non-terminal
+data Exp = HInt Int     -- ^ `int' token
+         | HRead ()     -- ^ `(read)` token
+         | HSub Exp     -- ^ `(- exp)` token
+         | HAdd Exp Exp -- ^ `(+ exp exp)` token
+         | HVar HVar    -- ^ `var` token
+         | HLet HVar Exp Exp -- ^ `(let ([var exp]) exp) token
          deriving (Eq, Show)
 
 -- | Represents `hlisp` token

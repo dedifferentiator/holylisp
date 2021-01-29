@@ -14,7 +14,8 @@
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 module REPL
-    ( repl
+    ( evalL
+    , repl
     ) where
 
 import Eval
@@ -26,13 +27,9 @@ import Structs
 readL :: IO Text
 readL = getLine
 
--- TODO: remove comments starting with ';'
--- later should check for cases with ';' inside
--- strings
-
 -- | Evaluates input
-evalL :: Text -> HolyLisp
-evalL = runO1 . hParse
+evalL :: Text -> IO HolyLisp
+evalL = runProg . runO1 . hParse
 
 -- | Prints result of interpretation
 printL :: Show a => a -> IO ()
@@ -40,7 +37,7 @@ printL = print
 
 -- | Read-eval-print
 rep :: IO ()
-rep = readL >>= printL . evalL
+rep = readL >>= evalL >>= printL
 
 -- | Read-eval-print loop
 repl :: IO ()

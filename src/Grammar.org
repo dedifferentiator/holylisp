@@ -1,9 +1,15 @@
 * Grammar of HolyLisp
 
 ** Concrete syntax
-  exp ::= _int_ | (read) | (- exp) | (+ exp exp)
+  =FIXME: notation=
+
+  int   ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+  read  ::= "read"
+  char  ::= "[a-Z]"
+  var   ::= char | char var
+  exp   ::= int | (read) | (- exp) | (+ exp exp) | var  | (let ([var exp]) exp)
   hlisp ::= exp
 
 ** Abstract syntax
-  Exp ::= _HInt_ | HRead () | HMinus Exp | HAdd Exp Exp
+  Exp ::= _HInt_ | HRead () | HMinus Exp | HAdd Exp Exp | HVar | HLet HVar HExp
   HolyLisp ::= () Exp

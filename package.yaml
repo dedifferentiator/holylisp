@@ -63,5 +63,10 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     - -Wall
+    default-extensions:
+    - BlockArguments
+    - NoImplicitPrelude
+    - OverloadedStrings
     dependencies:
-    - hlisp
+    - holylisp
+    - hspec
