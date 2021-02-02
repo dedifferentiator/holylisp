@@ -27,16 +27,18 @@ source-repository head
 
 library
   exposed-modules:
-      Deprecated
       Eval
       Parser
+      Pass.Pass
+      Pass.State
       REPL
       Structs
   other-modules:
       Paths_holylisp
   hs-source-dirs:
       src
-  default-extensions: ConstraintKinds DataKinds FlexibleContexts OverloadedStrings NoImplicitPrelude TypeApplications TypeFamilies TypeOperators
+  default-extensions: ConstraintKinds DataKinds FlexibleContexts GeneralizedNewtypeDeriving OverloadedStrings NoImplicitPrelude TypeApplications TypeFamilies TypeOperators
+  ghc-options: -Wall
   build-depends:
       base >=4.7 && <5
     , megaparsec
@@ -66,6 +68,7 @@ test-suite hlisp-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      PassesSpec
       REPLSpec
       Paths_holylisp
   hs-source-dirs:

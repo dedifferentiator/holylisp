@@ -20,8 +20,11 @@ module REPL
 
 import Eval
 import Parser
+import Pass.Pass
+import Pass.State
 import Relude
 import Structs
+
 
 -- | Reads input line
 readL :: IO Text
@@ -31,13 +34,16 @@ readL = getLine
 evalL :: Text -> IO HolyLisp
 evalL = runProg . runO1 . hParse
 
+evalT :: Text -> IO HolyLisp
+evalT = (fst <$>) . runUniq 0 . uniquify . hParse
+
 -- | Prints result of interpretation
 printL :: Show a => a -> IO ()
 printL = print
 
 -- | Read-eval-print
 rep :: IO ()
-rep = readL >>= evalL >>= printL
+rep = readL >>= evalT >>= printL
 
 -- | Read-eval-print loop
 repl :: IO ()

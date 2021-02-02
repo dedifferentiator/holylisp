@@ -18,9 +18,7 @@ module Parser
   , hParseTest
   ) where
 
-import           Control.Monad (void)
 import qualified Data.Text as T
-import           Data.Void (Void)
 import           Relude hiding (many, some)
 import           Structs
 import           Text.Megaparsec
@@ -58,11 +56,11 @@ pHSub = do
   void $ char '('
   void space
   void $ char '-'
-  (HolyLisp _ exp) <- try pExp
+  (HolyLisp _ e) <- try pExp
   void space
   void $ char ')'
 
-  return $ HSub exp
+  return $ HSub e
 
 -- | Parses HAdd
 pHAdd :: Parser Exp
@@ -71,13 +69,13 @@ pHAdd = do
   void $ char '('
   void space
   void $ char '+'
-  (HolyLisp _ exp1) <- try pExp
+  (HolyLisp _ e1) <- try pExp
   void space
-  (HolyLisp _ exp2) <- try pExp
+  (HolyLisp _ e2) <- try pExp
   void space
   void $ char ')'
 
-  return $ HAdd exp1 exp2
+  return $ HAdd e1 e2
 
 -- | Parses HVar
 pHVar :: Parser HVar
@@ -102,7 +100,7 @@ pHLet = do
   void space
   var <- try pHVar
   void space
-  (HolyLisp _ exp) <- try pExp
+  (HolyLisp _ e) <- try pExp
   void space
   void $ char ']'
   void space
@@ -111,7 +109,7 @@ pHLet = do
   (HolyLisp _ body) <- try pExp
   void $ char ')'
 
-  return $ HLet var exp body
+  return $ HLet var e body
 
 -- | Parses Exp
 pExp :: Parser HolyLisp

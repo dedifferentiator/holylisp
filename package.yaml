@@ -28,10 +28,13 @@ dependencies:
 
 library:
   source-dirs: src
+  ghc-options:
+    - -Wall
   default-extensions:
     - ConstraintKinds
     - DataKinds
     - FlexibleContexts
+    - GeneralizedNewtypeDeriving
     - OverloadedStrings
     - NoImplicitPrelude
     - TypeApplications

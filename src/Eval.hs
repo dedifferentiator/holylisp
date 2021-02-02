@@ -18,8 +18,7 @@ module Eval
   , runProg
   ) where
 
-import Parser
-import Relude
+import Relude hiding (exp)
 import Structs
 import Data.Text (unpack)
 
@@ -53,13 +52,13 @@ optimise exp =
     HSub (HRead m) -> HSub $ HRead m
     HSub (HSub e)  -> e
     HSub (HVar s)  -> HSub $ HVar s
-    HSub exp       -> HSub $ optimise exp
+    HSub e         -> HSub $ optimise e
 
     HLet v e1 e2 -> HLet v (optimise e1) $ optimise e2
 
     _ -> exp
 
--- | Replaces all `hvar` occurrences in `body` with `exp`, preserving shadowing
+-- | Replaces all `hvar` occurrences with `exp` in `body`, preserving shadowing
 resolveVar :: HVar -> Exp -> Exp -> Exp
 resolveVar hvar exp body =
   case body of
