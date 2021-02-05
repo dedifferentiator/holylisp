@@ -1,6 +1,6 @@
 module PassesSpec where
 
-import Pass.Pass
+import Pass.Uniquify
 import Pass.State
 import Relude
 import Structs

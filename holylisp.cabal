@@ -29,8 +29,10 @@ library
   exposed-modules:
       Eval
       Parser
-      Pass.Pass
+      Pass.Passes
+      Pass.RMCO
       Pass.State
+      Pass.Uniquify
       REPL
       Structs
   other-modules:
@@ -38,7 +40,7 @@ library
   hs-source-dirs:
       src
   default-extensions: ConstraintKinds DataKinds FlexibleContexts GeneralizedNewtypeDeriving OverloadedStrings NoImplicitPrelude TypeApplications TypeFamilies TypeOperators
-  ghc-options: -Wall
+  ghc-options: -O3 -Wall
   build-depends:
       base >=4.7 && <5
     , megaparsec
@@ -54,7 +56,7 @@ executable hlisp
   hs-source-dirs:
       app
   default-extensions: NoImplicitPrelude
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall
+  ghc-options: -O3 -threaded -rtsopts -with-rtsopts=-N -Wall
   build-depends:
       base >=4.7 && <5
     , holylisp

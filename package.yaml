@@ -29,6 +29,7 @@ dependencies:
 library:
   source-dirs: src
   ghc-options:
+    - -O3
     - -Wall
   default-extensions:
     - ConstraintKinds
@@ -46,7 +47,7 @@ executables:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
-    # - -O3
+    - -O3
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N

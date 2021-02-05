@@ -13,38 +13,16 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-module Pass.State
-  ( genNewVar
-  , genVar
-  , runUniq
-  , Uniq
-  , UniqApp (..)
+module Pass.Passes
+  ( runPasses
   ) where
 
+import Pass.RMCO
+import Pass.State
+import Pass.Uniquify
 import Relude
 import Structs
 
-type Uniq m = MonadState Int m
-
-newtype UniqApp a = UniqApp
-  { runUniqApp :: StateT Int IO a
-  } deriving (Monad, Applicative, Functor, MonadState Int)
-
--- | Generates unique variable
-genVar :: Uniq m => HVar -> m HVar
-genVar (TVar var) = do
-    n <- get
-    put $ n + 1
-    return . TVar $ var <> show n
-
--- | Generates new unique variable
-genNewVar :: Uniq m => m HVar
-genNewVar = do
-  n <- get
-  put $ n + 1
-  return . TVar $ "tmp" <> show n
-
-
--- | Runs Uniq state monad
-runUniq :: Int -> UniqApp a -> IO (a, Int)
-runUniq p pa = runStateT (runUniqApp pa) p
+-- | Runs all compiler passes
+runPasses :: Uniq m => HolyLisp -> m HolyLisp
+runPasses h = uniquify h >>= rmCO

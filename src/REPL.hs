@@ -20,7 +20,7 @@ module REPL
 
 import Eval
 import Parser
-import Pass.Pass
+import Pass.Passes
 import Pass.State
 import Relude
 import Structs
@@ -35,7 +35,7 @@ evalL :: Text -> IO HolyLisp
 evalL = runProg . runO1 . hParse
 
 evalT :: Text -> IO HolyLisp
-evalT = (fst <$>) . runUniq 0 . uniquify . hParse
+evalT = (fst <$>) . runUniq 0 . (runPasses . hParse)
 
 -- | Prints result of interpretation
 printL :: Show a => a -> IO ()

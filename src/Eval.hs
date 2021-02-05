@@ -35,40 +35,43 @@ optimise exp =
   case exp of
     -- TODO: add optimisations for such exps as
     -- `(+ int (+ exp int) = (+ exp (+ int + int))`, etc
+    HAdd e -> optAdd e
 
-    HAdd (HInt i1) (HInt i2)        -> HInt $ i1 + i2
-    HAdd (HInt i1) (HSub (HInt i2)) -> HInt $ i1 - i2
-    HAdd (HSub (HInt i1)) (HInt i2) -> HInt $ i2 - i1
+    HSub (TSub (HInt (TInt i)))   -> HInt . TInt $ -i
+    HSub (TSub (HRead (TRead m))) -> HSub . TSub $ HRead $ TRead m
+    HSub (TSub (HSub (TSub e)))   -> e
+    HSub (TSub (HVar (TVar s)))  -> HSub $ TSub $ HVar $ TVar s
+    HSub (TSub e)        -> HSub . TSub $ optimise e
 
-    HAdd (HRead m) e -> HAdd (HRead m) $ optimise e
-    HAdd e (HRead m) -> HAdd (optimise e) $ HRead m
-
-    HAdd (HInt i1) e -> HAdd (HInt i1) $ optimise e
-    HAdd e (HInt i2) -> HAdd (optimise e) $ HInt i2
-    HAdd e1 e2       -> HAdd (optimise e1) $ optimise e2
-
-
-    HSub (HInt i)  -> HInt $ -i
-    HSub (HRead m) -> HSub $ HRead m
-    HSub (HSub e)  -> e
-    HSub (HVar s)  -> HSub $ HVar s
-    HSub e         -> HSub $ optimise e
-
-    HLet v e1 e2 -> HLet v (optimise e1) $ optimise e2
+    HLet (TLet v e1 e2) -> HLet $ TLet v (optimise e1) $ optimise e2
 
     _ -> exp
+
+optAdd :: HAdd -> Exp
+optAdd expr@TAdd{} =
+  case expr of
+    TAdd (HInt (TInt i1)) (HInt (TInt i2))               -> HInt . TInt $ i1 + i2
+    TAdd (HInt (TInt i1)) (HSub (TSub (HInt (TInt i2)))) -> HInt . TInt $ i1 - i2
+    TAdd (HSub (TSub (HInt (TInt i1)))) (HInt (TInt i2)) -> HInt . TInt $ i2 - i1
+
+    TAdd (HRead (TRead m)) e -> HAdd $ TAdd (HRead $ TRead m) $ optimise e
+    TAdd e (HRead (TRead m)) -> HAdd $ TAdd (optimise e) $ HRead $ TRead m
+
+    TAdd (HInt i1) e        -> HAdd $ TAdd (HInt i1) $ optimise e
+    TAdd e (HInt (TInt i2)) -> HAdd $ TAdd (optimise e) $ HInt $ TInt i2
+    TAdd e1 e2              -> HAdd $ TAdd (optimise e1) $ optimise e2
 
 -- | Replaces all `hvar` occurrences with `exp` in `body`, preserving shadowing
 resolveVar :: HVar -> Exp -> Exp -> Exp
 resolveVar hvar exp body =
   case body of
-    HLet v e1 e2 -> resolveVar hvar exp $ resolveVar v e1 e2
+    HLet (TLet v e1 e2) -> resolveVar hvar exp $ resolveVar v e1 e2
 
-    HAdd (HInt i1) (HInt i2) -> HInt $ i1 + i2
-    HAdd (HVar v) e -> if v == hvar then HAdd exp e else HAdd (HVar v) e
-    HAdd e (HVar v) -> if v == hvar then HAdd e exp else HAdd e (HVar v)
+    HAdd (TAdd (HInt (TInt i1)) (HInt (TInt i2))) -> HInt . TInt $ i1 + i2
+    HAdd (TAdd (HVar v) e) -> if v == hvar then HAdd $ TAdd exp e else HAdd $ TAdd (HVar v) e
+    HAdd (TAdd e (HVar v)) -> if v == hvar then HAdd $ TAdd e exp else HAdd $ TAdd e (HVar v)
 
-    HSub (HVar v) -> if v == hvar then HSub exp else HSub (HVar v)
+    HSub (TSub (HVar v)) -> if v == hvar then HSub $ TSub exp else HSub $ TSub (HVar v)
 
     _ -> exp
 
@@ -79,19 +82,19 @@ interpretExp exp = do
   case exp of
     HInt i -> return $ HInt i
 
-    HRead _ -> HInt . fromMaybe (error "err: cannot parse Int") . readMaybe @Int . unpack <$> getLine
+    HRead (TRead _) -> HInt . TInt . fromMaybe (error "err: cannot parse Int") . readMaybe @Int . unpack <$> getLine
 
-    HSub (HInt i) -> return $ HInt $ -i
-    HSub e -> interpretExp . HSub =<< interpretExp e
+    HSub (TSub (HInt (TInt i))) -> return . HInt . TInt $ -i
+    HSub (TSub e) -> interpretExp . HSub . TSub =<< interpretExp e
 
-    HAdd (HInt i1) (HInt i2) -> return $ HInt $ i1 + i2
-    HAdd i1@(HInt _) e -> interpretExp .      HAdd i1 =<< interpretExp e
-    HAdd e i2@(HInt _) -> interpretExp . flip HAdd i2 =<< interpretExp e
-    HAdd e1 e2         -> interpretExp =<< HAdd <$> interpretExp e1 <*> interpretExp e2
+    HAdd (TAdd (HInt (TInt i1)) (HInt (TInt i2))) -> return . HInt . TInt $ i1 + i2
+    HAdd (TAdd i1@(HInt _) e) -> interpretExp . HAdd .      TAdd i1 =<< interpretExp e
+    HAdd (TAdd e i2@(HInt _)) -> interpretExp . HAdd . flip TAdd i2 =<< interpretExp e
+    HAdd (TAdd e1 e2)        -> interpretExp . HAdd =<< TAdd <$> interpretExp e1 <*> interpretExp e2
 
     HVar v -> return $ HVar v
 
-    HLet v e body -> interpretExp $ resolveVar v e body
+    HLet (TLet v e body) -> interpretExp $ resolveVar v e body
 
 
 -- | Interprtes hlisp into the smallest possible ast

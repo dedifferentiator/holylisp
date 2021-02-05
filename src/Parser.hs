@@ -31,11 +31,11 @@ pHInt :: Parser Exp
 pHInt = do
   void space
   x <- some digitChar
-  let intH = fromMaybe (error "[Parser] Error: cannot read Int from value")
+  let tint = fromMaybe (error "[Parser] Error: cannot read Int from value")
             $ readMaybe @Int x
   void space
 
-  return $ HInt intH
+  return $ HInt $ TInt tint
 
 -- | Parses HRead
 pHRead :: Parser Exp
@@ -47,7 +47,7 @@ pHRead = do
   void space
   void $ char ')'
 
-  return $ HRead ()
+  return $ HRead $ TRead ()
 
 -- | Parses HSub
 pHSub :: Parser Exp
@@ -60,7 +60,7 @@ pHSub = do
   void space
   void $ char ')'
 
-  return $ HSub e
+  return $ HSub $ TSub e
 
 -- | Parses HAdd
 pHAdd :: Parser Exp
@@ -75,7 +75,7 @@ pHAdd = do
   void space
   void $ char ')'
 
-  return $ HAdd e1 e2
+  return $ HAdd $ TAdd e1 e2
 
 -- | Parses HVar
 pHVar :: Parser HVar
@@ -109,7 +109,7 @@ pHLet = do
   (HolyLisp _ body) <- try pExp
   void $ char ')'
 
-  return $ HLet var e body
+  return $ HLet $ TLet var e body
 
 -- | Parses Exp
 pExp :: Parser HolyLisp
