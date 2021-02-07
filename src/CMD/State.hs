@@ -13,29 +13,32 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-module REPL
-    ( evalL
-    , repl
-    ) where
+module CMD.State
+  ( Config
+  , ConfigApp (..)
+  , parseCmd
+  , runConfig
+  ) where
 
-import Eval
-import Parser
+import CMD.CMD
+import Options.Applicative
 import Relude
-import Structs
 
+type Config m = (MonadIO m, MonadState Options m)
 
--- | Reads input line
-readL :: IO Text
-readL = getLine
+newtype ConfigApp a = ConfigApp
+  { runConfigApp :: StateT Options IO a
+  } deriving (Monad, Applicative, Functor, MonadState Options, MonadIO)
 
--- | Evaluates input
-evalL :: Text -> IO HolyLisp
-evalL = runProg . runO1 . hParse
+-- | Runs Config state monad
+runConfig :: Options -> ConfigApp a -> IO (a, Options)
+runConfig opt v = runStateT (runConfigApp v) opt
 
--- | Prints result of interpretation
-printL :: Show a => a -> IO ()
-printL = print
-
--- | Read-eval-print loop
-repl :: IO ()
-repl = readL >>= evalL >>= printL >> repl
+-- | Parse cmd flags
+parseCmd :: IO Options
+parseCmd = execParser opts
+  where
+    opts = info (optionsP <**> helper)
+      $ fullDesc
+     <> progDesc "holylisp compiler"
+     <> header   "holylisp - the holiest of all lisps"

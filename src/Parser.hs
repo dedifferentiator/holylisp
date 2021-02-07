@@ -27,19 +27,19 @@ import           Text.Megaparsec.Char
 type Parser = Parsec Void T.Text
 
 -- | Parses HInt
-pHInt :: Parser Exp
-pHInt = do
+hIntP :: Parser Exp
+hIntP = do
   void space
   x <- some digitChar
   let tint = fromMaybe (error "[Parser] Error: cannot read Int from value")
-            $ readMaybe @Int x
+           $ readMaybe @Int x
   void space
 
   return $ HInt $ TInt tint
 
 -- | Parses HRead
-pHRead :: Parser Exp
-pHRead = do
+hReadP :: Parser Exp
+hReadP = do
   void space
   void $ char '('
   void space
@@ -50,36 +50,36 @@ pHRead = do
   return $ HRead $ TRead ()
 
 -- | Parses HSub
-pHSub :: Parser Exp
-pHSub = do
+hSubP :: Parser Exp
+hSubP = do
   void space
   void $ char '('
   void space
   void $ char '-'
-  (HolyLisp _ e) <- try pExp
+  (HolyLisp _ e) <- try expP
   void space
   void $ char ')'
 
   return $ HSub $ TSub e
 
 -- | Parses HAdd
-pHAdd :: Parser Exp
-pHAdd = do
+hAddP :: Parser Exp
+hAddP = do
   void space
   void $ char '('
   void space
   void $ char '+'
-  (HolyLisp _ e1) <- try pExp
+  (HolyLisp _ e1) <- try expP
   void space
-  (HolyLisp _ e2) <- try pExp
+  (HolyLisp _ e2) <- try expP
   void space
   void $ char ')'
 
   return $ HAdd $ TAdd e1 e2
 
 -- | Parses HVar
-pHVar :: Parser HVar
-pHVar = do
+hVarP :: Parser HVar
+hVarP = do
   void space
   var <- try $ some letterChar
   void space
@@ -87,8 +87,8 @@ pHVar = do
   return $ TVar var
 
 -- | Parses HLet
-pHLet :: Parser Exp
-pHLet = do
+hLetP :: Parser Exp
+hLetP = do
   void space
   void $ char '('
   void space
@@ -98,33 +98,33 @@ pHLet = do
   void space
   void $ char '['
   void space
-  var <- try pHVar
+  var <- try hVarP
   void space
-  (HolyLisp _ e) <- try pExp
+  (HolyLisp _ e) <- try expP
   void space
   void $ char ']'
   void space
   void $ char ')'
   void space
-  (HolyLisp _ body) <- try pExp
+  (HolyLisp _ body) <- try expP
   void $ char ')'
 
   return $ HLet $ TLet var e body
 
 -- | Parses Exp
-pExp :: Parser HolyLisp
-pExp = HolyLisp () <$>
-  (try pHInt
-   <|> (try pHVar <&> HVar)
-   <|> try pHRead
-   <|> try pHSub
-   <|> try pHAdd
-   <|> pHLet)
+expP :: Parser HolyLisp
+expP = HolyLisp () <$>
+  (try hIntP
+   <|> (try hVarP <&> HVar)
+   <|> try hReadP
+   <|> try hSubP
+   <|> try hAddP
+   <|> hLetP)
 
 -- | Parses HLisp expression
 hParse :: T.Text -> HolyLisp
-hParse = either (error "cannot parse expression") id . parse pExp ""
+hParse = either (error "cannot parse expression") id . parse expP ""
 
 -- | Runs HLisp parser
 hParseTest :: T.Text -> IO ()
-hParseTest = parseTest $ pExp <* eof
+hParseTest = parseTest $ expP <* eof

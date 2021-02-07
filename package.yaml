@@ -21,42 +21,67 @@ description:         Please see the README on GitHub at <https://github.com/dedi
 
 dependencies:
 - base >= 4.7 && < 5
+- colourista
+- generic-lens
+- optparse-applicative
 - megaparsec
 - mtl
 - relude
 - text
 
+default-extensions:
+  - BlockArguments
+  - ConstraintKinds
+  - DataKinds
+  - DeriveGeneric
+  - FlexibleContexts
+  - GeneralizedNewtypeDeriving
+  - OverloadedStrings
+  - NoImplicitPrelude
+  - StrictData
+  - TypeApplications
+  - TypeFamilies
+  - TypeOperators
+
 library:
   source-dirs: src
   ghc-options:
     - -O3
+    - -fwrite-ide-info
+    - -hiedir=.hie
     - -Wall
-  default-extensions:
-    - ConstraintKinds
-    - DataKinds
-    - FlexibleContexts
-    - GeneralizedNewtypeDeriving
-    - OverloadedStrings
-    - NoImplicitPrelude
-    - TypeApplications
-    - TypeFamilies
-    - TypeOperators
 
 executables:
   hlisp:
     main:                Main.hs
-    source-dirs:         app
+    source-dirs:         hlisp
     ghc-options:
     - -O3
+    - -fwrite-ide-info
+    - -hiedir=.hie
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
     - -Wall
     # - -prof
-    default-extensions:
-    - NoImplicitPrelude
     dependencies:
     - holylisp
+
+  hlispi:
+    main:                Main.hs
+    source-dirs:         hlispi
+    ghc-options:
+    - -O3
+    - -fwrite-ide-info
+    - -hiedir=.hie
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    - -Wall
+    # - -prof
+    dependencies:
+    - holylisp
+
 
 tests:
   hlisp-test:
@@ -67,10 +92,6 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     - -Wall
-    default-extensions:
-    - BlockArguments
-    - NoImplicitPrelude
-    - OverloadedStrings
     dependencies:
     - holylisp
     - hspec

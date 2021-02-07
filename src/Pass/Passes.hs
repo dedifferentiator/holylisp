@@ -17,6 +17,10 @@ module Pass.Passes
   ( runPasses
   ) where
 
+import Colourista.IO
+import CMD.State
+import Data.Generics.Internal.VL
+import Data.Generics.Product
 import Pass.RMCO
 import Pass.State
 import Pass.Uniquify
@@ -24,5 +28,28 @@ import Relude
 import Structs
 
 -- | Runs all compiler passes
-runPasses :: Uniq m => HolyLisp -> m HolyLisp
-runPasses h = uniquify h >>= rmCO
+runPasses :: Config m => HolyLisp -> m HolyLisp
+runPasses h = do
+  conf <- get
+  let ast = conf ^. field @"ast"
+      shu = ast  ^. field @"shUniquify"
+      shr = ast  ^. field @"shRMCO"
+
+  let uniqPass = runUniq 0 $ uniquify h
+      rmcoPass = join $ runUniq
+            <$> (       snd <$> uniqPass)
+            <*> (rmCO . fst <$> uniqPass)
+
+  -- print passes if required flags
+  -- were given to compiler
+  when shu $ liftIO $
+    greenMessage "\n>>= UNIQUIFY PASS:"
+    >> uniqPass >>= putStr . ("  " <>) . show . fst
+    >> putText "\n"
+
+  when shr $ liftIO $
+    greenMessage "\n>>= RMCO PASS:"
+    >> rmcoPass >>= putStr . ("  " <>) . show . fst
+    >> putTextLn "\n"
+
+  liftIO $ fst <$> runUniq 0 (uniquify h >>= rmCO)

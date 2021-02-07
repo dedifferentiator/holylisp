@@ -44,7 +44,6 @@ genNewVar = do
   put $ n + 1
   return . TVar $ "tmp" <> show n
 
-
 -- | Runs Uniq state monad
 runUniq :: Int -> UniqApp a -> IO (a, Int)
 runUniq p pa = runStateT (runUniqApp pa) p

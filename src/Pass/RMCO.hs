@@ -70,7 +70,7 @@ isAddAtom (TAdd e1 e2) = isAt e1 && isAt e2
 isSubAtom :: HSub -> Bool
 isSubAtom (TSub (HInt _)) = True
 isSubAtom (TSub (HVar _)) = True
-isSubAtom _ = False
+isSubAtom _               = False
 
 -- | Removes complex operands in HSub
 rmCHSub :: Uniq m => HSub -> m HSub

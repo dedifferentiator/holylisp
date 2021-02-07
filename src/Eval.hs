@@ -75,7 +75,6 @@ resolveVar hvar exp body =
 
     _ -> exp
 
-
 -- | Interprets `Exp`
 interpretExp :: Exp -> IO Exp
 interpretExp exp = do
@@ -95,7 +94,6 @@ interpretExp exp = do
     HVar v -> return $ HVar v
 
     HLet (TLet v e body) -> interpretExp $ resolveVar v e body
-
 
 -- | Interprtes hlisp into the smallest possible ast
 runProg :: HolyLisp -> IO HolyLisp

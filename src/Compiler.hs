@@ -13,10 +13,27 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-module Main where
+module Compiler where
 
-import REPL
+import CMD.State
+import Parser
+import Pass.Passes
 import Relude
+import Structs
 
-main :: IO ()
-main = repl
+
+-- | Reads input line
+readL :: Config m => m Text
+readL = getLine
+
+-- | Evaluates input
+evalL :: Config m => Text -> m HolyLisp
+evalL = runPasses . hParse
+
+-- | Prints result of interpretation
+printL :: (Show a, Config m) => a -> m ()
+printL = putTextLn . ("Result:\n  " <>) . show
+
+-- | Compiles code
+compile :: Config m => m ()
+compile = readL >>= evalL >>= printL

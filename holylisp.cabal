@@ -27,6 +27,9 @@ source-repository head
 
 library
   exposed-modules:
+      CMD.CMD
+      CMD.State
+      Compiler
       Eval
       Parser
       Pass.Passes
@@ -39,12 +42,15 @@ library
       Paths_holylisp
   hs-source-dirs:
       src
-  default-extensions: ConstraintKinds DataKinds FlexibleContexts GeneralizedNewtypeDeriving OverloadedStrings NoImplicitPrelude TypeApplications TypeFamilies TypeOperators
-  ghc-options: -O3 -Wall
+  default-extensions: BlockArguments ConstraintKinds DataKinds DeriveGeneric FlexibleContexts GeneralizedNewtypeDeriving OverloadedStrings NoImplicitPrelude StrictData TypeApplications TypeFamilies TypeOperators
+  ghc-options: -O3 -fwrite-ide-info -hiedir=.hie -Wall
   build-depends:
       base >=4.7 && <5
+    , colourista
+    , generic-lens
     , megaparsec
     , mtl
+    , optparse-applicative
     , relude
     , text
   default-language: Haskell2010
@@ -54,14 +60,37 @@ executable hlisp
   other-modules:
       Paths_holylisp
   hs-source-dirs:
-      app
-  default-extensions: NoImplicitPrelude
-  ghc-options: -O3 -threaded -rtsopts -with-rtsopts=-N -Wall
+      hlisp
+  default-extensions: BlockArguments ConstraintKinds DataKinds DeriveGeneric FlexibleContexts GeneralizedNewtypeDeriving OverloadedStrings NoImplicitPrelude StrictData TypeApplications TypeFamilies TypeOperators
+  ghc-options: -O3 -fwrite-ide-info -hiedir=.hie -threaded -rtsopts -with-rtsopts=-N -Wall
   build-depends:
       base >=4.7 && <5
+    , colourista
+    , generic-lens
     , holylisp
     , megaparsec
     , mtl
+    , optparse-applicative
+    , relude
+    , text
+  default-language: Haskell2010
+
+executable hlispi
+  main-is: Main.hs
+  other-modules:
+      Paths_holylisp
+  hs-source-dirs:
+      hlispi
+  default-extensions: BlockArguments ConstraintKinds DataKinds DeriveGeneric FlexibleContexts GeneralizedNewtypeDeriving OverloadedStrings NoImplicitPrelude StrictData TypeApplications TypeFamilies TypeOperators
+  ghc-options: -O3 -fwrite-ide-info -hiedir=.hie -threaded -rtsopts -with-rtsopts=-N -Wall
+  build-depends:
+      base >=4.7 && <5
+    , colourista
+    , generic-lens
+    , holylisp
+    , megaparsec
+    , mtl
+    , optparse-applicative
     , relude
     , text
   default-language: Haskell2010
@@ -75,14 +104,17 @@ test-suite hlisp-test
       Paths_holylisp
   hs-source-dirs:
       test
-  default-extensions: BlockArguments NoImplicitPrelude OverloadedStrings
+  default-extensions: BlockArguments ConstraintKinds DataKinds DeriveGeneric FlexibleContexts GeneralizedNewtypeDeriving OverloadedStrings NoImplicitPrelude StrictData TypeApplications TypeFamilies TypeOperators
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall
   build-depends:
       base >=4.7 && <5
+    , colourista
+    , generic-lens
     , holylisp
     , hspec
     , megaparsec
     , mtl
+    , optparse-applicative
     , relude
     , text
   default-language: Haskell2010

@@ -13,29 +13,10 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-module REPL
-    ( evalL
-    , repl
-    ) where
+module Main where
 
-import Eval
-import Parser
 import Relude
-import Structs
+import REPL
 
-
--- | Reads input line
-readL :: IO Text
-readL = getLine
-
--- | Evaluates input
-evalL :: Text -> IO HolyLisp
-evalL = runProg . runO1 . hParse
-
--- | Prints result of interpretation
-printL :: Show a => a -> IO ()
-printL = print
-
--- | Read-eval-print loop
-repl :: IO ()
-repl = readL >>= evalL >>= printL >> repl
+main :: IO ()
+main = repl
